@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>لوحة الصلاة</title>
+
+<style>
+*{
+  box-sizing:border-box;
+  font-family:Tahoma, Arial;
+}
+
+body{
+  margin:0;
+  height:100vh;
+  background:url("background.jpg") no-repeat center center fixed;
+  background-size:cover;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+.overlay{
+  background:rgba(0,0,0,0.70);
+  width:95%;
+  max-width:420px;
+  border-radius:18px;
+  padding:15px;
+  color:white;
+  text-align:center;
+}
+
+.logo{
+  width:80px;
+  margin-bottom:6px;
+}
+
+.title{
+  font-size:18px;
+  font-weight:bold;
+  margin-bottom:5px;
+}
+
+.date{
+  font-size:14px;
+  margin-bottom:8px;
+  color:#ffd700;
+}
+
+.clock{
+  font-size:36px;
+  font-weight:bold;
+  margin:8px 0;
+}
+
+.next{
+  font-size:16px;
+  margin-bottom:10px;
+  color:#00ffd5;
+}
+
+.table{
+  width:100%;
+  font-size:17px;
+}
+
+.row{
+  display:flex;
+  justify-content:space-between;
+  border-bottom:1px solid rgba(255,255,255,0.25);
+  padding:6px 0;
+}
+</style>
+</head>
+
+<body>
+
+<div class="overlay">
+
+<img src="logo.png" class="logo">
+
+<div class="title">
+الجمعية الخيرية مسك الختام – الڨرارم ڨوڨة
+</div>
+
+<div class="date" id="date">--</div>
+
+<div class="clock" id="clock">00:00:00</div>
+
+<div class="next" id="nextPrayer">الصلاة القادمة</div>
+
+<div class="table">
+
+<div class="row"><span>الإمساك</span><span id="imsak">06:00</span></div>
+<div class="row"><span>الفجر</span><span id="fajr">06:10</span></div>
+<div class="row"><span>الظهر</span><span id="dhuhr">12:50</span></div>
+<div class="row"><span>العصر</span><span id="asr">15:37</span></div>
+<div class="row"><span>المغرب</span><span id="maghrib">18:03</span></div>
+<div class="row"><span>العشاء</span><span id="isha">19:23</span></div>
+
+</div>
+
+</div>
+
+<script>
+const prayers = [
+ {name:"الإمساك", time:"06:00"},
+ {name:"الفجر", time:"06:10"},
+ {name:"الظهر", time:"12:50"},
+ {name:"العصر", time:"15:37"},
+ {name:"المغرب", time:"18:03"},
+ {name:"العشاء", time:"19:23"}
+];
+
+function updateClock(){
+ const now = new Date();
+
+ const h = String(now.getHours()).padStart(2,"0");
+ const m = String(now.getMinutes()).padStart(2,"0");
+ const s = String(now.getSeconds()).padStart(2,"0");
+
+ document.getElementById("clock").innerText =
+ h + ":" + m + ":" + s;
+
+ document.getElementById("date").innerText =
+ now.toLocaleDateString("ar-DZ",{
+   weekday:"long",
+   year:"numeric",
+   month:"long",
+   day:"numeric"
+ });
+
+ let current = now.getHours()*60 + now.getMinutes();
+ let next = null;
+
+ for(let p of prayers){
+   let [ph,pm]=p.time.split(":");
+   let total = ph*60 + Number(pm);
+   if(total > current){
+     next = p;
+     break;
+   }
+ }
+
+ if(!next) next = prayers[1];
+
+ document.getElementById("nextPrayer").innerText =
+ "الصلاة القادمة: " + next.name + " (" + next.time + ")";
+}
+
+setInterval(updateClock,1000);
+updateClock();
+</script>
+
+</body>
+</html>
