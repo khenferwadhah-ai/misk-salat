@@ -3,155 +3,120 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>لوحة الصلاة</title>
-
+<title>لوحة صلاة المغرب</title>
 <style>
-*{
-  box-sizing:border-box;
-  font-family:Tahoma, Arial;
-}
-
-body{
+/* ===== أسلوب الصفحة ===== */
+body {
   margin:0;
-  height:100vh;
-  background:url("background.jpg") no-repeat center center fixed;
-  background-size:cover;
+  padding:0;
+  font-family:'Cairo', sans-serif;
   display:flex;
   justify-content:center;
   align-items:center;
-}
-
-.overlay{
-  background:rgba(0,0,0,0.70);
-  width:95%;
-  max-width:420px;
-  border-radius:18px;
-  padding:15px;
+  height:100vh;
+  background: linear-gradient(to bottom, #0f2027, #203a43, #2c5364);
   color:white;
+}
+
+.overlay {
+  background: rgba(0,0,0,0.5);
+  padding:30px 40px;
+  border-radius:20px;
   text-align:center;
+  min-width:350px;
 }
 
-.logo{
-  width:80px;
-  margin-bottom:6px;
+.logo {
+  width:100px;
+  margin-bottom:15px;
 }
 
-.title{
-  font-size:18px;
-  font-weight:bold;
-  margin-bottom:5px;
+.mainTitle {
+  font-size:24px;
+  font-weight:700;
+  color:gold;
+  margin-bottom:15px;
+  text-shadow: 0 0 10px rgba(255,215,0,0.8);
 }
 
-.date{
-  font-size:14px;
-  margin-bottom:8px;
-  color:#ffd700;
-}
-
-.clock{
+.title {
   font-size:36px;
-  font-weight:bold;
-  margin:8px 0;
+  font-weight:900;
+  color:#ffcc00;
+  margin-bottom:20px;
+  text-shadow: 0 0 12px #ffcc00;
 }
 
-.next{
-  font-size:16px;
-  margin-bottom:10px;
-  color:#00ffd5;
+#countdownText {
+  font-size:28px;
+  font-weight:700;
+  margin-bottom:15px;
+  color:lime;
 }
 
-.table{
-  width:100%;
-  font-size:17px;
-}
-
-.row{
-  display:flex;
-  justify-content:space-between;
-  border-bottom:1px solid rgba(255,255,255,0.25);
-  padding:6px 0;
+/* ===== العد التنازلي داخل إطار أبيض متوهج ===== */
+#nextPrayerClock {
+  font-size:60px;
+  font-weight:900;
+  color:#00ff00; /* أخضر إلكتروني */
+  padding:15px 25px;
+  border:4px solid white; /* الإطار الأبيض */
+  border-radius:15px;
+  text-shadow:
+     0 0 10px #00ff00,
+     0 0 20px #00ff00,
+     0 0 30px #00ff00,
+     0 0 40px #00ff00; /* توهج الساعة */
+  display:inline-block;
 }
 </style>
 </head>
-
 <body>
 
 <div class="overlay">
 
-<img src="logo.png" class="logo">
+  <!-- اللوغو -->
+  <img src="logo.png" alt="لوغو الجمعية" class="logo">
 
-<div class="title">
-الجمعية الخيرية مسك الختام – الڨرارم ڨوڨة
-</div>
+  <!-- العنوان الكامل -->
+  <div class="mainTitle">الجمعية الخيرية مسك الختام القرارم قوقة</div>
 
-<div class="date" id="date">--</div>
+  <!-- اسم الصلاة -->
+  <div class="title">المغرب</div>
 
-<div class="clock" id="clock">00:00:00</div>
+  <!-- نص العد التنازلي -->
+  <div id="countdownText">الإفطار بعد:</div>
 
-<div class="next" id="nextPrayer">الصلاة القادمة</div>
-
-<div class="table">
-
-<div class="row"><span>الإمساك</span><span id="imsak">06:00</span></div>
-<div class="row"><span>الفجر</span><span id="fajr">06:10</span></div>
-<div class="row"><span>الظهر</span><span id="dhuhr">12:50</span></div>
-<div class="row"><span>العصر</span><span id="asr">15:37</span></div>
-<div class="row"><span>المغرب</span><span id="maghrib">18:03</span></div>
-<div class="row"><span>العشاء</span><span id="isha">19:23</span></div>
-
-</div>
+  <!-- إطار الساعة -->
+  <div id="nextPrayerClock">--:--:--</div>
 
 </div>
 
 <script>
-const prayers = [
- {name:"الإمساك", time:"06:00"},
- {name:"الفجر", time:"06:10"},
- {name:"الظهر", time:"12:50"},
- {name:"العصر", time:"15:37"},
- {name:"المغرب", time:"18:03"},
- {name:"العشاء", time:"19:23"}
-];
+// ===== وقت صلاة المغرب (الإفطار) =====
+let maghribTime = "18:04"; // عدل الوقت حسب جدولك
 
-function updateClock(){
- const now = new Date();
+function updateCountdown() {
+  const now = new Date();
 
- const h = String(now.getHours()).padStart(2,"0");
- const m = String(now.getMinutes()).padStart(2,"0");
- const s = String(now.getSeconds()).padStart(2,"0");
+  // حساب العد التنازلي
+  const [h, m] = maghribTime.split(":").map(Number);
+  const target = new Date();
+  target.setHours(h, m, 0, 0);
 
- document.getElementById("clock").innerText =
- h + ":" + m + ":" + s;
+  let diff = target - now;
+  if(diff < 0) diff = 0; // بعد الإفطار يظهر 00:00:00
 
- document.getElementById("date").innerText =
- now.toLocaleDateString("ar-DZ",{
-   weekday:"long",
-   year:"numeric",
-   month:"long",
-   day:"numeric"
- });
+  const hours = String(Math.floor(diff/3600000)).padStart(2,"0");
+  const minutes = String(Math.floor((diff%3600000)/60000)).padStart(2,"0");
+  const seconds = String(Math.floor((diff%60000)/1000)).padStart(2,"0");
 
- let current = now.getHours()*60 + now.getMinutes();
- let next = null;
-
- for(let p of prayers){
-   let [ph,pm]=p.time.split(":");
-   let total = ph*60 + Number(pm);
-   if(total > current){
-     next = p;
-     break;
-   }
- }
-
- if(!next) next = prayers[1];
-
- document.getElementById("nextPrayer").innerText =
- "الصلاة القادمة: " + next.name + " (" + next.time + ")";
+  document.getElementById("nextPrayerClock").innerText = `${hours}:${minutes}:${seconds}`;
 }
 
-setInterval(updateClock,1000);
-updateClock();
+// تحديث العد التنازلي كل ثانية
+setInterval(updateCountdown,1000);
+updateCountdown();
 </script>
 
 </body>
